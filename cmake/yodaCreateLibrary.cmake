@@ -26,7 +26,7 @@ include(CMakeParseArguments)
 #   yoda_create_library(TARGET SOURCES VERSION TARGET_GROUP TARGET_NAMESPACE 
 #           INSTALL_DESTINATION OBJECTS LIBRARIES DEPENDS SOURCES PUBLIC_BUILD_INCLUDES 
 #           PUBLIC_INSTALL_INCLUDES INTERFACE_BUILD_INCLUDES INTERFACE_INSTALL_INCLUDES 
-#           PRIVATE_BUILD_INCLUDES )
+#           PRIVATE_BUILD_INCLUDES PUBLIC_SYSTEM_INCLUDES)
 #
 # ``TARGET:STRING``
 #    Target name of the library
@@ -51,6 +51,8 @@ include(CMakeParseArguments)
 #    List of include paths to add as property of the target. Different argument keywords are used to 
 #    specify PUBLIC, INTERFACE or PRIVATE properties as well as to add it to the BUILD or INSTALL 
 #    generator expression
+# ``PUBLIC_SYSTEM_INCLUDES [optional]
+#   List of Public system includes
 function(yoda_create_library)
 
   #
@@ -59,14 +61,14 @@ function(yoda_create_library)
   set(options NATIVE_PYTHON_LIB)
   set(oneValueArgs TARGET TARGET_GROUP INSTALL_DESTINATION TARGET_NAMESPACE)
   set(multiValueArgs OBJECTS LIBRARIES DEPENDS SOURCES PUBLIC_BUILD_INCLUDES PUBLIC_INSTALL_INCLUDES 
-            INTERFACE_BUILD_INCLUDES INTERFACE_INSTALL_INCLUDES PRIVATE_BUILD_INCLUDES VERSION)
+            INTERFACE_BUILD_INCLUDES INTERFACE_INSTALL_INCLUDES PRIVATE_BUILD_INCLUDES VERSION PUBLIC_SYSTEM_INCLUDES)
   cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
   yoda_require_arg("TARGET" ${ARG_TARGET})
   yoda_require_arg("VERSION" ${ARG_VERSION})
 
   if(ARG_INSTALL_DESTINATION)
-    set(install_destination ${ARG_INSTALL_DESTINATION)
+    set(install_destination ${ARG_INSTALL_DESTINATION})
   else()
     set(install_destination lib)
   endif()
@@ -194,6 +196,15 @@ function(yoda_create_library)
       target_include_directories(${target_lib} ${__include_paths} )
       unset(__include_paths)
     endif()
+
+	if(NOT("${ARG_PUBLIC_SYSTEM_INCLUDES}" STREQUAL ""))
+		set(__include_paths SYSTEM INTERFACE)
+		foreach(inc_dir ${ARG_PUBLIC_SYSTEM_INCLUDES})
+			list(APPEND __include_paths $<INSTALL_INTERFACE:${inc_dir}>)
+			target_include_directories(${target_lib} ${__include_paths})
+		endforeach()
+		unset(__include_paths)
+	endif()
   endforeach()
 
 ## Propagate the interface include directories of dependencies
