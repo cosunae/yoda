@@ -196,7 +196,6 @@ function(yoda_create_library)
       target_include_directories(${target_lib} ${__include_paths} )
       unset(__include_paths)
     endif()
-  endforeach()
 
 	if(NOT("${ARG_PUBLIC_SYSTEM_INCLUDES}" STREQUAL ""))
 		set(__include_paths SYSTEM INTERFACE)
@@ -206,6 +205,7 @@ function(yoda_create_library)
 		endforeach()
 		unset(__include_paths)
 	endif()
+  endforeach()
 
 ## Propagate the interface include directories of dependencies
   unset(__include_paths)
