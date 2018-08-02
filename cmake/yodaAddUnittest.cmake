@@ -34,19 +34,38 @@ include(yodaAddExecutable)
 #   Arguments passed to the created GTest exectuable (e.g ``--gtest_color=yes``)
 #
 function(yoda_add_unittest)
-  set(one_value_args NAME OUTPUT_DIR)
-  set(multi_value_args SOURCES DEPENDS GTEST_ARGS)
+  set(one_value_args NAME OUTPUT_DIR INSTALL_DESTINATION)
+  set(multi_value_args SOURCES DEPENDS LIBRARIES INCLUDE_DIRECTORIES)
   cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT("${ARG_UNPARSED_ARGUMENTS}" STREQUAL ""))
     message(FATAL_ERROR "yoda_add_unittest: invalid argument ${ARG_UNPARSED_ARGUMENTS}")
   endif()
 
+  yoda_require_arg("NAME" ${ARG_NAME})
+  yoda_require_arg("SOURCES" ${ARG_SOURCES})
+
+  set(opt_arg)
+  if(ARG_DEPENDS)
+    set(opt_arg ${opt_arg} DEPENDS ${ARG_DEPENDS})
+  endif()
+  if(ARG_OUTPUT_DIR)
+    set(opt_arg ${opt_arg} OUTPUT_DIR ${ARG_OUTPUT_DIR})
+  endif()
+  if(ARG_LIBRARIES)
+    set(opt_arg ${opt_arg} LIBRARIES ${ARG_LIBRARIES})
+  endif() 
+  if(ARG_INCLUDE_DIRECTORIES)
+    set(opt_arg ${opt_arg} INCLUDE_DIRECTORIES ${ARG_INCLUDE_DIRECTORIES})
+  endif()
+  if(ARG_INSTALL_DESTINATION)
+    set(opt_arg ${opt_arg} INSTALL_DESTINATION ${ARG_INSTALL_DESTINATION})
+  endif()
+
   yoda_add_executable(
     NAME ${ARG_NAME} 
     SOURCES ${ARG_SOURCES} 
-    DEPENDS ${ARG_DEPENDS}
-    OUTPUT_DIR ${ARG_OUTPUT_DIR}
+    ${opt_arg}
   )  
 
   add_test(NAME CTest-${ARG_NAME} COMMAND $<TARGET_FILE:${ARG_NAME}> ${ARG_GTEST_ARGS})

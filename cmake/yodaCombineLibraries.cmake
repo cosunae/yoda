@@ -22,7 +22,8 @@ include(yodaRequireArg)
 #
 # .. code-block:: cmake
 #
-#   yoda_combine_libraries(NAME OBJECTS DEPENDS)
+#   yoda_combine_libraries(NAME OBJECTS DEPENDS INSTALL_DESTINATION VERSION
+#           TARGET_GROUP TARGET_NAMESPACE DEPENDS)
 #
 # ``NAME``
 #   Name of the library.
@@ -30,12 +31,19 @@ include(yodaRequireArg)
 #   Object libraries to combine (see :ref:`yoda_add_library`).
 # ``INSTALL_DESTINATION``
 #   Destition (relative to ``CMAKE_INSTALL_PREFIX``) to install the libraries.
+# ``VERSION``
+#   Version of the library
+# ``TARGET_GROUP:STRING`` [optional]
+#    Target group where the target will be added. The target will be exported in file
+#    <INSTALL_DESTINATION>/<TARGET_GROUP>.cmake
+# ``TARGET_NAMESPACE:STRING`` [optional]
+#    Namespace where the target will be generated
 # ``DEPENDS`` [optional]
 #   List of external libraries and/or CMake targets treated as dependencies of the library.
 #
 function(yoda_combine_libraries)
   set(options)
-  set(one_value_args NAME INSTALL_DESTINATION VERSION)
+  set(one_value_args NAME INSTALL_DESTINATION VERSION TARGET_GROUP TARGET_NAMESPACE)
   set(multi_value_args OBJECTS DEPENDS)
   cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -53,6 +61,17 @@ function(yoda_combine_libraries)
     endforeach()
   endif()
 
+  if(NOT("${ARG_TARGET_GROUP}" STREQUAL ""))
+    set(target_group_name ${ARG_TARGET_GROUP})
+  else()
+    set(target_group_name ${ARG_NAME}Targets)
+  endif()
+
+  set(target_namespace)
+  if(NOT("${ARG_TARGET_NAMESPACE}" STREQUAL ""))
+    set(target_namespace NAMESPACE ${ARG_TARGET_NAMESPACE})
+  endif()
+
   # Add static library
   add_library(${ARG_NAME}Static STATIC ${object_sources})
   target_link_libraries(${ARG_NAME}Static PUBLIC ${ARG_DEPENDS})
@@ -62,8 +81,8 @@ function(yoda_combine_libraries)
 
   install(TARGETS ${ARG_NAME}Static 
           DESTINATION ${ARG_INSTALL_DESTINATION} 
-          EXPORT ${ARG_NAME}Targets)
-  
+          EXPORT ${target_group_name})
+ 
   # Add shared library
   if(BUILD_SHARED_LIBS)
     add_library(${ARG_NAME}Shared SHARED ${object_sources})
@@ -73,8 +92,14 @@ function(yoda_combine_libraries)
     set_target_properties(${ARG_NAME}Shared PROPERTIES VERSION ${ARG_VERSION})
     set_target_properties(${ARG_NAME}Shared PROPERTIES SOVERSION ${ARG_VERSION})
 
+    
+
     install(TARGETS ${ARG_NAME}Shared 
             DESTINATION ${ARG_INSTALL_DESTINATION} 
-            EXPORT ${ARG_NAME}Targets)
+            EXPORT ${target_group_name})
   endif()
+
+  # Export the targets
+  install(EXPORT ${target_group_name} ${target_namespace} FILE ${target_group_name}.cmake DESTINATION ${CMAKE_INSTALL_PREFIX}/cmake)
+
 endfunction()

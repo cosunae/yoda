@@ -33,8 +33,6 @@ function(yoda_external_package)
   )
 
   list(APPEND ARG_CMAKE_ARGS "-DYODA_ROOT=${ARG_YODA_ROOT}")
-  # set the install path to bundle project install dir
-  set(ARG_CMAKE_ARGS ${ARG_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>)
 
   ExternalProject_Add(cosmo-prerelease-gtclang
     SOURCE_DIR ${ARG_SOURCE_DIR}

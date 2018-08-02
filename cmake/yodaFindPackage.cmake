@@ -81,12 +81,15 @@ macro(yoda_find_package)
 
   set(use_system FALSE)
   if(NOT(USE_SYSTEM_${package_upper}))
+
+    ## CALL External_<pkg>
+
     set(USE_SYSTEM_${package_upper} OFF CACHE BOOL ${doc} FORCE)
     include(${external_file})
 
     set(CMAKE_ARGS)
     yoda_get_cache_variables(CMAKE_ARGS)
-    set(forward_params "CMAKE_ARGS" ${CMAKE_ARGS} ${ARG_ADDITIONAL})
+    set(forward_params "CMAKE_ARGS" ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> ${ARG_ADDITIONAL})
     if(ARG_FORWARD_VARS) 
       set(forward_params ${forward_params} "FORWARD_VARS" ${ARG_FORWARD_VARS})
     endif()
@@ -124,6 +127,7 @@ macro(yoda_find_package)
       message(STATUS "Package ${ARG_PACKAGE} not found due to missing:${missing_required_vars}")    
     endif()
     
+    ## Check if requirements are fulfilled, and if so find the version found
     if(required_vars_ok AND (${ARG_PACKAGE}_FOUND   OR 
                              ${package_upper}_FOUND OR
                              ${ARG_PACKAGE}_DIR)) 
@@ -157,11 +161,15 @@ macro(yoda_find_package)
       endif()
 
     else()
+
+      ## CALL External_<pkg>
+    
       set(USE_SYSTEM_${package_upper} OFF CACHE BOOL ${doc} FORCE)
       set(CMAKE_ARGS)
       yoda_get_cache_variables(CMAKE_ARGS)
       include(${external_file})
-      set(forward_params "CMAKE_ARGS" ${CMAKE_ARGS} ${ARG_ADDITIONAL})
+
+      set(forward_params "CMAKE_ARGS" ${CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> ${ARG_ADDITIONAL})
       if(ARG_FORWARD_VARS)
         set(forward_params ${forward_params} "FORWARD_VARS" ${ARG_FORWARD_VARS})
       endif()

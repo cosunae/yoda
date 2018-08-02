@@ -59,7 +59,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'yoda'
+project = 'Dawn'
 copyright = '2017, ETH Zurich and MeteoSwiss'
 author = 'Fabian Thuering, Carlos Osuna and Tobias Wicky'
 
@@ -212,7 +212,7 @@ html_show_sourcelink = False
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'yodadoc'
+htmlhelp_basename = 'Dawndoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 

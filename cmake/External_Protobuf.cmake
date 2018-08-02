@@ -27,7 +27,6 @@ function(yoda_external_package)
 
   set(cmake_args
     ${ARG_CMAKE_ARGS}
-    -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
     -DBUILD_SHARED_LIBS=ON                                                         
     -Dprotobuf_BUILD_EXAMPLES=OFF
     -Dprotobuf_BUILD_SHARED_LIBS=ON

@@ -43,8 +43,10 @@ List of all functions and macros
   /cmake-modules/External_GTClang
   /cmake-modules/External_GridTools
   /cmake-modules/External_Protobuf
+  /cmake-modules/External_cosmo-prerelease-gtclang
   /cmake-modules/External_dawn
   /cmake-modules/External_gtclang
+  /cmake-modules/External_serialbox2
   /cmake-modules/yodaAddCustomDummyTarget
   /cmake-modules/yodaAddExecutable
   /cmake-modules/yodaAddLibrary
@@ -60,7 +62,9 @@ List of all functions and macros
   /cmake-modules/yodaCloneRepository
   /cmake-modules/yodaCombineLibraries
   /cmake-modules/yodaConfigureFile
+  /cmake-modules/yodaCreateLibrary
   /cmake-modules/yodaCreatePackageString
+  /cmake-modules/yodaCreatePackageString2
   /cmake-modules/yodaEnableFullRPATH
   /cmake-modules/yodaExportOptions
   /cmake-modules/yodaExportPackage
@@ -78,6 +82,7 @@ List of all functions and macros
   /cmake-modules/yodaMakeCMakeScript
   /cmake-modules/yodaMakePackageInfo
   /cmake-modules/yodaMakeStringPair
+  /cmake-modules/yodaPrintTargetProperties
   /cmake-modules/yodaReportResult
   /cmake-modules/yodaRequireArg
   /cmake-modules/yodaRequireOnlyOneOf

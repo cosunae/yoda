@@ -39,7 +39,6 @@ ExternalProject_Add(gtclang
    INSTALL_DIR "${CMAKE_INSTALL_PREFIX}"
    CMAKE_ARGS
      ${gtclang_cmake_args}
-    -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>
    DEPENDS
      ${gtclang_deps}
      dawn
