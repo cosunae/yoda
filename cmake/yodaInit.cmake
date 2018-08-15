@@ -22,6 +22,8 @@ if(NOT CMAKE_INSTALL_PREFIX)
       "Install path prefix, prepended onto install directories." FORCE)
 endif()
 
+include(yodaAddTargetCleanAll)
+include(yodaCreatePackageString)
 include(yodaCheckInSourceBuild)
 include(yodaGetArchitectureInfo)
 include(yodaGetCompilerInfo)
@@ -37,6 +39,7 @@ include(yodaCreateLibrary)
 include(yodaPrintTargetProperties)
 include(yodaAddTargetCleanAll)
 include(yodaSetDownloadDir)
+
 
 #we add the modules directory of yoda
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/modules")

@@ -45,5 +45,8 @@ macro(yoda_get_compiler_info)
     set(YODA_COMPILER_CLANG 1 CACHE INTERNAL "Compiler is LLVM Clang" FORCE)
     set(YODA_COMPILER_STRING "LLVM Clang (${CMAKE_CXX_COMPILER_VERSION})" 
         CACHE INTERNAL "Compiler-id string" FORCE)
+  else()
+    ## TODO add support for fortran compiler
+    set(YODA_COMPILER_STRING "unknown" CACHE INTERNAL  "" FORCE)
   endif()
 endmacro()
