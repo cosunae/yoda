@@ -32,10 +32,17 @@ include(yodaAddExecutable)
 #   Directory to place the exectuable (e.g ``${CMAKE_BINARY_DIR}/bin``).
 # ``GTEST_ARGS`` [optional]
 #   Arguments passed to the created GTest exectuable (e.g ``--gtest_color=yes``)
-#
+# ``LIBRARIES`` 
+#   List of external libraries and/or CMake targets to link against. 
+# ``DEPENDS`` 
+#   List of cmake targets the executable depends on 
+# ``INSTALL_DESTINATION`` [optional] 
+#   Destition (relative to ``CMAKE_INSTALL_PREFIX``) to install the executable.
+# ``INCLUDE_DIRECTORIES`` [optional]
+#   include directories for compilaton
 function(yoda_add_unittest)
   set(one_value_args NAME OUTPUT_DIR INSTALL_DESTINATION)
-  set(multi_value_args SOURCES DEPENDS LIBRARIES INCLUDE_DIRECTORIES)
+  set(multi_value_args SOURCES DEPENDS LIBRARIES INCLUDE_DIRECTORIES GTEST_ARGS)
   cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT("${ARG_UNPARSED_ARGUMENTS}" STREQUAL ""))
