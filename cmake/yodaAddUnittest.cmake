@@ -36,7 +36,6 @@ include(yodaAddExecutable)
 function(yoda_add_unittest)
   set(one_value_args NAME OUTPUT_DIR INSTALL_DESTINATION)
   set(multi_value_args SOURCES DEPENDS LIBRARIES INCLUDE_DIRECTORIES)
-message("IIII ${ARGN}")
   cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
   if(NOT("${ARG_UNPARSED_ARGUMENTS}" STREQUAL ""))

@@ -83,6 +83,7 @@ function(yoda_create_library)
   yoda_add_library(
     NAME ${ARG_TARGET}
     SOURCES ${ARG_SOURCES}
+    DEPENDS ${ARG_LIBRARIES} ${ARG_DEPENDS}
     OBJECT
   )
 
@@ -150,7 +151,6 @@ function(yoda_create_library)
     OBJECTS ${ARG_TARGET}Objects ${ARG_OBJECTS}
     INSTALL_DESTINATION ${install_destination} 
     VERSION ${ARG_VERSION}
-    DEPENDS ${ARG_LIBRARIES} ${ARG_DEPENDS}
     ${opt_arg}
   )
 endfunction(yoda_create_library)
