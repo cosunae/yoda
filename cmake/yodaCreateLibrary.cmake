@@ -51,13 +51,15 @@ include(CMakeParseArguments)
 #    List of include paths to add as property of the target. Different argument keywords are used to 
 #    specify PUBLIC, INTERFACE or PRIVATE properties as well as to add it to the BUILD or INSTALL 
 #    generator expression
+# ``BUILD_SHARED`` [optional]
+#    Specifies whether we build shared libraries or not. If not specified, the CMAKE global builtin 
+#    BUILD_SHARED_LIBS variable is set.
 function(yoda_create_library)
 
   #
   # Parse arguments
   #
-  set(options NATIVE_PYTHON_LIB)
-  set(oneValueArgs TARGET TARGET_GROUP INSTALL_DESTINATION TARGET_NAMESPACE)
+  set(oneValueArgs TARGET TARGET_GROUP INSTALL_DESTINATION TARGET_NAMESPACE BUILD_SHARED)
   set(multiValueArgs OBJECTS LIBRARIES DEPENDS SOURCES PUBLIC_BUILD_INCLUDES PUBLIC_INSTALL_INCLUDES 
             INTERFACE_BUILD_INCLUDES INTERFACE_INSTALL_INCLUDES PRIVATE_BUILD_INCLUDES VERSION)
   cmake_parse_arguments(ARG "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
@@ -81,6 +83,7 @@ function(yoda_create_library)
   yoda_add_library(
     NAME ${ARG_TARGET}
     SOURCES ${ARG_SOURCES}
+    DEPENDS ${ARG_LIBRARIES} ${ARG_DEPENDS}
     OBJECT
   )
 
@@ -91,6 +94,11 @@ function(yoda_create_library)
     endforeach()
   endif()
 
+
+  ## In case we build with shared library, we need to compile with position independent
+  if((NOT ARG_BUILD_SHARED STREQUAL "OFF") AND (BUILD_SHARED_LIBS OR (ARG_BUILD_SHARED STREQUAL "ON")))   
+	  set_property(TARGET ${ARG_TARGET}Objects PROPERTY POSITION_INDEPENDENT_CODE 1) 
+  endif()
 
   if(NOT("${ARG_PUBLIC_BUILD_INCLUDES}" STREQUAL "") OR NOT("${ARG_PUBLIC_INSTALL_INCLUDES}" STREQUAL ""))
     set(__include_paths PUBLIC)
@@ -134,69 +142,16 @@ function(yoda_create_library)
   if(ARG_TARGET_NAMESPACE)
     set(opt_arg ${opt_arg} TARGET_NAMESPACE ${ARG_TARGET_NAMESPACE})
   endif()
+  if(ARG_BUILD_SHARED)
+    set(opt_arg ${opt_arg} BUILD_SHARED ${ARG_BUILD_SHARED})
+  endif(ARG_BUILD_SHARED)
 
   yoda_combine_libraries(
     NAME ${ARG_TARGET}
     OBJECTS ${ARG_TARGET}Objects ${ARG_OBJECTS}
     INSTALL_DESTINATION ${install_destination} 
     VERSION ${ARG_VERSION}
-    DEPENDS ${ARG_LIBRARIES} ${ARG_DEPENDS}
     ${opt_arg}
   )
-
-  set(target_libs ${ARG_TARGET}Static)
-  if(BUILD_SHARED_LIBS) 
-    set(target_libs ${target_libs} ${ARG_TARGET}Shared)
-  endif(BUILD_SHARED_LIBS)
-
-
-  ## For the libraries built from the Objects file, we dont need to declare the public include directories,
-  ## since the object files are already compiled, but we need to propate the include directories as interface
-  foreach(target_lib ${target_libs})
-
-    if(NOT("${ARG_PUBLIC_BUILD_INCLUDES}" STREQUAL "") OR NOT("${ARG_PUBLIC_INSTALL_INCLUDES}" STREQUAL ""))
-      set(__include_paths INTERFACE)
-      foreach(inc_dir ${ARG_PUBLIC_BUILD_INCLUDES})
-        if(${inc_dir} STREQUAL "SYSTEM")
-          set(__include_paths SYSTEM INTERFACE) 
-          continue()
-        else()
-          list(APPEND __include_paths $<BUILD_INTERFACE:${inc_dir}>)
-          target_include_directories(${target_lib} ${__include_paths})
-          set(__include_paths INTERFACE)
-        endif()
-      endforeach()
-      foreach(inc_dir ${ARG_PUBLIC_INSTALL_INCLUDES})
-        set(__include_paths INTERFACE)
-        if(${inc_dir} STREQUAL "SYSTEM")
-          message(FATAL "SYSTEM keyword is not allowed in the PUBLIC_INSTALL_XXX")
-        else()
-          list(APPEND __include_paths $<INSTALL_INTERFACE:${inc_dir}>)
-          target_include_directories(${target_lib} ${__include_paths})
-        endif()
-      endforeach()
-
-      unset(__include_paths)
-    endif()
-
-    if(NOT("${ARG_INTERFACE_BUILD_INCLUDES}" STREQUAL "") OR NOT("${ARG_INTERFACE_INSTALL_INCLUDES}" STREQUAL ""))
-      set(__include_paths INTERFACE)
-      if(NOT("${ARG_INTERFACE_BUILD_INCLUDES}" STREQUAL ""))
-        list(APPEND __include_paths $<BUILD_INTERFACE:${ARG_INTERFACE_BUILD_INCLUDES}>)
-      endif()
-      if(NOT("${ARG_INTERFACE_INSTALL_INCLUDES}" STREQUAL ""))
-        list(APPEND __include_paths $<INSTALL_INTERFACE:${ARG_INTERFACE_INSTALL_INCLUDES}>)
-      endif()
-      target_include_directories(${target_lib} ${__include_paths} )
-      unset(__include_paths)
-    endif()
-  endforeach()
-
-## Propagate the interface include directories of dependencies
-  unset(__include_paths)
-
-  target_include_directories(${ARG_TARGET}Static INTERFACE ${__include_paths} )
-  unset(__include_paths)
-
 endfunction(yoda_create_library)
 

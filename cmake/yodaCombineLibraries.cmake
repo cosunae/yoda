@@ -40,10 +40,13 @@ include(yodaRequireArg)
 #    Namespace where the target will be generated
 # ``DEPENDS`` [optional]
 #   List of external libraries and/or CMake targets treated as dependencies of the library.
-#
+# ``BUILD_SHARED`` [optional]
+#    Specifies whether we build shared libraries or not. If not specified, the CMAKE global builtin
+#    BUILD_SHARED_LIBS variable is set.
+
 function(yoda_combine_libraries)
   set(options)
-  set(one_value_args NAME INSTALL_DESTINATION VERSION TARGET_GROUP TARGET_NAMESPACE)
+  set(one_value_args NAME INSTALL_DESTINATION VERSION TARGET_GROUP TARGET_NAMESPACE BUILD_SHARED)
   set(multi_value_args OBJECTS DEPENDS)
   cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
@@ -84,16 +87,13 @@ function(yoda_combine_libraries)
           EXPORT ${target_group_name})
  
   # Add shared library
-  if(BUILD_SHARED_LIBS)
+  if((NOT ARG_BUILD_SHARED STREQUAL "OFF") AND (BUILD_SHARED_LIBS OR (ARG_BUILD_SHARED STREQUAL "ON")))
     add_library(${ARG_NAME}Shared SHARED ${object_sources})
     target_link_libraries(${ARG_NAME}Shared PUBLIC ${ARG_DEPENDS})
     
     set_target_properties(${ARG_NAME}Shared PROPERTIES OUTPUT_NAME ${ARG_NAME})
     set_target_properties(${ARG_NAME}Shared PROPERTIES VERSION ${ARG_VERSION})
     set_target_properties(${ARG_NAME}Shared PROPERTIES SOVERSION ${ARG_VERSION})
-
-    
-
     install(TARGETS ${ARG_NAME}Shared 
             DESTINATION ${ARG_INSTALL_DESTINATION} 
             EXPORT ${target_group_name})
